@@ -61,3 +61,7 @@
     // Startar animationen när bilden laddats.
     spriteSheet.onload = requestAnimationFrame(draw)
 
+
+    // Laddar idle sprite sheet 
+    const spriteSheet = new Image()
+    spriteSheet.src = "Legacy-Fantasy - High Forest 2.3/Character/Idle/Idle-Sheet.png"
