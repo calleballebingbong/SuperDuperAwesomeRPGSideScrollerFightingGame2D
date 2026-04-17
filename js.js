@@ -5,6 +5,22 @@
     const ctx = canvas.getContext("2d")
 
 
+  let x = 0;
+  let y = 0;
+  let vx = 0;
+  let vy = 0;
+
+  function updatechar(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+      x += vx;
+      y += vy;
+      ctx.fillRect(x, y, 50, 50)
+      requestAnimationFrame(updatechar)
+  }
+
+  updatechar()
+
+
     // Laddar sprite sheet
     const spriteSheet = new Image()
     spriteSheet.src = "Legacy-Fantasy - High Forest 2.3/Character/Run/Run-Sheet.png"
