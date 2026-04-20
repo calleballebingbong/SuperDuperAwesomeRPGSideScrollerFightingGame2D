@@ -1,27 +1,17 @@
-
+let jumpCount = 0;
+let maxJumps = 2;
 
 addEventListener("keydown", function(e) {
-    if (e.code == 'KeyD') vx = 5;
-        if (e.code == 'KeyA') vx = -5;
-        if (e.code == 'KeyW') {
-        vy = -5;
+    if (e.code === "KeyD") rightDown = true;
+    if (e.code === "KeyA") leftDown = true;
+    if (e.code === "KeyW" && jumpCount < maxJumps) {
+    vy = -20;
+    grounded = false;
+    jumpCount ++;
     }
-        if (e.code == 'KeyS') {
-        vy = 5;
-    }
-})
+});
 
 addEventListener("keyup", function(e) {
-    if (e.code == 'KeyD') {
-        vx = 0;
-    }
-    if (e.code == 'KeyA') {
-        vx = 0;
-    }
-    if (e.code == 'KeyW') {
-        vy = 0;
-    }
-    if (e.code == 'KeyS') {
-        vy = 0;
-    }
-})
+    if (e.code === "KeyD") rightDown = false;
+    if (e.code === "KeyA") leftDown = false;
+});

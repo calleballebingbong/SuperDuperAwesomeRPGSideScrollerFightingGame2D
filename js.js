@@ -1,24 +1,58 @@
 
-    const canvas = document.getElementById("canvas")
-    canvas.width = 1200
-    canvas.height = 550
-    const ctx = canvas.getContext("2d")
+const canvas = document.getElementById("canvas")
+canvas.width = 1200
+canvas.height = 550
+const ctx = canvas.getContext("2d")
 
+let x = 0;
+let y = 0;
+let leftDown = false;
+let rightDown = false;
+let vx = 0;
+let vy = 0;
+let grounded = false;
 
-  let x = 0;
-  let y = 0;
-  let vx = 0;
-  let vy = 0;
+const width = 50;
+const height = 100;
+const gravity = 0.5;
+const speed = 10;
+const floor = canvas.height - height;
 
-  function updatechar(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-      x += vx;
-      y += vy;
-      ctx.fillRect(x, y, 50, 50)
-      requestAnimationFrame(updatechar)
+function collision() {
+  if (y >= canvas.height - height) {
+    y = canvas.height - height;
+    grounded = true;
+    vy = 0;
+    jumpCount = 0;
   }
+}
 
-  updatechar()
+function updateChar() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  vx = 0;
+  if (leftDown) vx = -speed;
+  if (rightDown) vx = speed;
+
+  x += vx;
+  vy += gravity;
+  y += vy;
+  
+  collision()
+
+  ctx.fillRect(x, y, width, height);
+  requestAnimationFrame(updateChar);
+}
+
+updateChar();
+
+  setInterval(function gravity() {
+    if (grounded == false){
+      vy += 0.2;
+    }
+  });
+
+
 
 
     // Laddar sprite sheet
