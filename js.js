@@ -14,6 +14,8 @@ if (!ctx) {
 
 let x = 0;
 let y = 0;
+let scrollX = 0;
+let xScreen = 0;
 let leftDown = false;
 let rightDown = false;
 let vx = 0;
@@ -25,7 +27,7 @@ let maxJumps = 2;
 const width = 50;
 const height = 100;
 const gravity = 1;
-const speed = 10;
+const speed = 5;
 const floor = canvas.height - height;
 
 const wallSlideGravity = 2;
@@ -34,6 +36,11 @@ let onWall = false;
 let wallDir = 0; // -1 for left wall, 1 for right wall
 let jumpKeyRelease = true;
 
+let invincible = false;
+let maxHealth = 100;
+let health = maxHealth;
+let damageCooldown = 500; //ms
+let lastDamageTime = 0;
 
 let enemies = [
   {
@@ -76,6 +83,8 @@ let enemies = [
 ];
 
 function enemyCollision() {
+  const now = Date.now();
+
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
     const ex = e.x;
@@ -93,12 +102,24 @@ function enemyCollision() {
       py + ph > ey &&
       py < ey + eh
     ){
-      console.log("Collision with enemy!");
-      // Reset player position
-      x = 0;
-      y = floor;
-      vy = 0;
-      // game over function later***
+      if (!invincible) {
+      health -= 10;
+      invincible = true
+      lastDamageTime = now
+
+      setTimeout(() => {
+        invincible = false;
+      }, damageCooldown);
+    }
+
+
+      if (health <= 0) {
+        health = maxHealth; // reset health **change to game over screen later**
+        x = 0;
+        y = floor;
+        vy = 0;
+
+      }
     }
   }
 }
@@ -187,13 +208,39 @@ function isTouchingWall() {
   }
 }
 
+let trees = [
+  {x: 1100, y: -100, width: 300, height: 700},
+  {x: 1300, y: 0, width: 300, height: 600},
+  {x: 1400, y: -100, width: 300, height: 700},
+];
+
+let rocks = [
+  {x: 500, y: floor + height - 70, width: 200, height: 100},
+  {x: 1250, y: floor + height - 70, width: 200, height: 100},
+];
+
+const treeImg = new Image();
+treeImg.src = "fantasy/Trees/Green-Tree.png";
+const treeSprites = [
+  { sx: 0, sy: 0, sw: 112, sh: 256 },   // first tree
+  { sx: 256, sy: 0, sw: 256, sh: 256 }, // second tree
+];
+
+const rockImg = new Image();
+rockImg.src = "fantasy/Trees/Rock.png";
+const rockSprites = [
+  { sx: 0, sy: 0, sw: 900, sh: 500 }
+];
 
 function updateChar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+
   vx = 0;
   if (leftDown) vx = -speed;
   if (rightDown) vx = speed;
+
+  x += vx;
 
   vy += gravity;
 
@@ -284,6 +331,20 @@ function updateChar() {
   // floor collision
   collision();
 
+    const centerX = canvas.width/ 2;
+
+  xScreen = x - scrollX;
+
+  if (xScreen > centerX + 200) {
+    scrollX += xScreen - (centerX + 200);
+    xScreen = centerX + 200;
+  }
+    if (xScreen < centerX - 200) {
+      scrollX += xScreen - (centerX - 200);
+      xScreen = centerX - 200;
+  }
+
+
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
 
@@ -335,19 +396,72 @@ function updateChar() {
   ctx.fillStyle = "black";
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
-    ctx.fillRect(block.x, block.y, block.width, block.height);
+    ctx.fillRect(block.x - scrollX, block.y, block.width, block.height);
   }
 
   // draw enemies
   ctx.fillStyle = "red";
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
-    ctx.fillRect(e.x, e.y, e.width, e.height);
+    ctx.fillRect(e.x - scrollX, e.y, e.width, e.height);
   }
+
 
   // draw player
   ctx.fillStyle = "blue";
-  ctx.fillRect(x, y, width, height);
+  ctx.fillRect(xScreen, y, width, height);
+
+
+  // draw health bar
+    const barWidth = 180;
+  const barHeight = 16;
+  const barX = 20;
+  const barY = 20;
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  ctx.fillStyle = "lime";
+  ctx.fillRect(barX, barY, barWidth * (health / maxHealth), barHeight);
+
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+    // draw rocks
+  if (rockImg.complete && rockImg.naturalWidth > 0) {
+    for (let i = 0; i < rocks.length; i++) {
+      const rock = rocks[i];
+      ctx.drawImage(
+        rockImg,
+        rockSprites[0].sx,
+        rockSprites[0].sy,
+        rockSprites[0].sw,
+        rockSprites[0].sh,
+        rock.x - scrollX,
+        rock.y,
+        rock.width,
+        rock.height
+      );
+    }
+  }
+
+  // draw trees
+  if (treeImg.complete && treeImg.naturalWidth > 0) {
+    for (let i = 0; i < trees.length; i++) {
+      const tree = trees[i];
+      ctx.drawImage(
+        treeImg,
+        treeSprites[0].sx,
+        treeSprites[0].sy,
+        treeSprites[0].sw,
+        treeSprites[0].sh,
+        tree.x - scrollX,
+        tree.y,
+        tree.width,
+        tree.height
+      );
+    }
+  }
 
   requestAnimationFrame(updateChar);
 }

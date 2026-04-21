@@ -2,7 +2,7 @@ addEventListener("keydown", function(e) {
     if (e.code === "KeyD") rightDown = true;
     if (e.code === "KeyA") leftDown = true;
 
-    if (e.code === "KeyW") {
+    if (e.code === "KeyW" || e.code === "Space") {
         if (jumpCount < maxJumps) {
             vy = -20;
             grounded = false;
@@ -20,5 +20,5 @@ addEventListener("keydown", function(e) {
 addEventListener("keyup", function(e) {
     if (e.code === "KeyD") rightDown = false;
     if (e.code === "KeyA") leftDown = false;
-    if (e.code === "KeyW") jumpKeyRelease = true;
+    if (e.code === "KeyW" || e.code === "Space") jumpKeyRelease = true;
 });
