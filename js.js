@@ -42,8 +42,17 @@ let health = maxHealth;
 let damageCooldown = 500; //ms
 let lastDamageTime = 0;
 
+let playerDamage = 10;
+const playerRange = 50; // range of player attack
+let isAttacking = false;
+let attackCooldown = 250; // ms
+let lastAttackTime = 0;
+
+
 let enemies = [
   {
+    maxHealth: 20,
+    health: 20,
     x: 300,
     y: floor + height - 50,
     width: 50,
@@ -54,8 +63,11 @@ let enemies = [
     endX: 1000,
     vy: 0,
     grounded: true,
+    lastHitTime: 0,
   },
   {
+    maxHealth: 20,
+    health: 20,
     x: 200,
     y: 400-50,
     width: 50,
@@ -66,8 +78,11 @@ let enemies = [
     endX: 550,
     vy: 0,
     grounded: true,
+    lastHitTime: 0,
   },
   {
+    maxHealth: 20,
+    health: 20,
     x: 400,
     y: 350-50,
     width: 50,
@@ -78,6 +93,7 @@ let enemies = [
     endX: 600,
     vy: 0,
     grounded: true,
+    lastHitTime: 0,
   }
 
 ];
@@ -124,6 +140,34 @@ function enemyCollision() {
   }
 }
 
+function playerAttack() {
+  const hitThisFrame = new Set();
+  const now = Date.now();
+  lastAttackTime = now;
+  isAttacking = true;
+
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+    const ex = e.x;
+    const ey = e.y;
+    const ew = e.width;
+    const eh = e.height;
+
+    const px = x;
+    const py = y;
+    const pw = width;
+    const ph = height;
+
+    if (px + pw + playerRange > ex && 
+      px - playerRange < ex + ew && 
+      py + ph > ey && py < ey + eh) {
+      e.health -= playerDamage;
+      e.lastHitTime = now;
+      hitThisFrame.add(i);
+    }
+  }
+  window.hitEnemiesThisFrame = Array.from(hitThisFrame);
+}
   //blocks
   let blocks = [
     {x: 100, y: 400, width: 200, height: 20},
@@ -407,6 +451,25 @@ function updateChar() {
   // enemy collision
   enemyCollision();
 
+  // attack logic moved to keydown event
+
+  window.hitEnemiesThisFrame = window.hitEnemiesThisFrame || [];
+
+const deadEnemies = [];
+for (let i = 0; i < enemies.length; i++) {
+  if (enemies[i].health <= 0) {
+    deadEnemies.push(enemies[i]);
+  }
+}
+enemies = enemies.filter(e => e.health > 0);
+
+ctx.fillStyle = "red";
+for (let i = 0; i < enemies.length; i++) {
+  const e = enemies[i];
+  ctx.fillRect(e.x - scrollX, e.y, e.width, e.height);
+}
+
+
   // draw blocks
   ctx.fillStyle = "black";
   for (let i = 0; i < blocks.length; i++) {
@@ -421,6 +484,41 @@ function updateChar() {
     ctx.fillRect(e.x - scrollX, e.y, e.width, e.height);
   }
 
+  //draw enemy health bars
+  const now = Date.now();
+  const healthBarDuration = 2000; // show health bar for 2 seconds after being hit
+  
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+
+    const timeSinceHit = now - e.lastHitTime;
+    const shouldShowHealthBar = timeSinceHit < healthBarDuration;
+
+    if (shouldShowHealthBar) {
+      const barX = e.x - scrollX + e.width / 2;
+      const barY = e.y - 20;
+      const barWidth = 40;
+      const barHeight = 6;
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(barX - barWidth / 2, barY, barWidth, barHeight);
+
+      const healthPercent = e.health / e.maxHealth;
+      ctx.fillStyle = "lime";
+      ctx.fillRect(barX - barWidth / 2, barY, barWidth * healthPercent, barHeight);
+
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(barX - barWidth / 2, barY, barWidth, barHeight);
+    }
+  }
+
+  if (isAttacking) {
+    setTimeout(() => {
+      window.hitEnemiesThisFrame = [];
+      isAttacking = false;
+    }, 100);
+  }
 
   // draw player
   ctx.fillStyle = "blue";

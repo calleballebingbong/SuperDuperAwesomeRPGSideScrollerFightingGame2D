@@ -1,6 +1,12 @@
 addEventListener("keydown", function(e) {
     if (e.code === "KeyD") rightDown = true;
     if (e.code === "KeyA") leftDown = true;
+    if (e.code === "KeyL") {
+        const now = Date.now();
+        if (now - lastAttackTime >= attackCooldown) {
+            playerAttack();
+        }
+    }
 
     if (e.code === "KeyW" || e.code === "Space") {
         if (jumpCount < maxJumps) {
