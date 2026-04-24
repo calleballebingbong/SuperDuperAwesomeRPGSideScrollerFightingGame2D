@@ -232,6 +232,21 @@ const rockSprites = [
   { sx: 0, sy: 0, sw: 900, sh: 500 }
 ];
 
+const playerIconImg = new Image();
+playerIconImg.src = "fantasy/HUD/Base-01.png";
+const playerIcon = 
+  { sx: 95, sy: 62, sw: 32, sh: 32 }
+;
+
+const healthBarImg = new Image();
+healthBarImg.src = "fantasy/HUD/Base-01.png";
+const healthBar = 
+  { sx: 243, sy: 107, sw: 58, sh: 27 }
+;
+
+const playerPortraitImg = new Image();
+playerPortraitImg.src = "fantasy/portraits/playerIcon.png";
+
 function updateChar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -411,22 +426,6 @@ function updateChar() {
   ctx.fillStyle = "blue";
   ctx.fillRect(xScreen, y, width, height);
 
-
-  // draw health bar
-    const barWidth = 180;
-  const barHeight = 16;
-  const barX = 20;
-  const barY = 20;
-
-  ctx.fillStyle = "red";
-  ctx.fillRect(barX, barY, barWidth, barHeight);
-
-  ctx.fillStyle = "lime";
-  ctx.fillRect(barX, barY, barWidth * (health / maxHealth), barHeight);
-
-  ctx.strokeStyle = "black";
-  ctx.strokeRect(barX, barY, barWidth, barHeight);
-
     // draw rocks
   if (rockImg.complete && rockImg.naturalWidth > 0) {
     for (let i = 0; i < rocks.length; i++) {
@@ -462,6 +461,59 @@ function updateChar() {
       );
     }
   }
+
+    //draw player icon
+
+if (playerPortraitImg.complete && playerPortraitImg.naturalWidth > 0) {
+  ctx.strokeStyle = "darkgreen";
+  ctx.fillStyle = "rgba(0, 128, 0, 0.5)";
+  ctx.fillRect(12, 15, 70, 70);
+  ctx.drawImage(playerPortraitImg, 13, 16, 68, 68);
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(12, 15, 70, 70, 10);
+  ctx.stroke();
+}
+
+  ctx.strokeStyle = "darkgreen";
+  ctx.fillStyle = "rgba(0, 128, 0, 0.5)";
+  ctx.fillRect(95, 13, 300, 68);
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(95, 13, 300, 68, 10);
+  ctx.stroke();
+
+  // draw health bar
+    const barWidth = 180;
+  const barHeight = 32;
+  const barX = 105;
+  const barY = 35;
+
+  ctx.lineWidth = 1;
+
+const radius = 8;
+const healthPercent = health / maxHealth;
+
+ctx.save();
+
+ctx.beginPath();
+ctx.roundRect(barX, barY, barWidth, barHeight, radius);
+ctx.fillStyle = "red";
+ctx.fill();
+
+ctx.beginPath();
+ctx.roundRect(barX, barY, barWidth * healthPercent, barHeight, radius);
+ctx.fillStyle = "lime";
+ctx.fill();
+
+ctx.beginPath();
+ctx.roundRect(barX, barY, barWidth, barHeight, radius);
+ctx.strokeStyle = "black";
+ctx.lineWidth = 1;
+ctx.stroke();
+
+ctx.restore();
+
 
   requestAnimationFrame(updateChar);
 }
