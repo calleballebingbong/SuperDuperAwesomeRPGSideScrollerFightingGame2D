@@ -28,3 +28,9 @@ addEventListener("keyup", function(e) {
     if (e.code === "KeyA") leftDown = false;
     if (e.code === "KeyW" || e.code === "Space") jumpKeyRelease = true;
 });
+
+document.addEventListener("keydown", (e) => {
+    if (gameOver && e.key.toLowerCase()=== 'r'){
+        resetGame();
+    }
+});
