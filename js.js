@@ -49,6 +49,9 @@ let isAttacking = false;
 let attackCooldown = 250; // ms
 let lastAttackTime = 0;
 
+const boarWalkImg = new Image();
+boarWalkImg.src = "fantasy/Mob/Boar/Walk/Walk-Base-Sheet.png";
+
 const treeImg = new Image();
 treeImg.src = "fantasy/Trees/Background.png";
 
@@ -236,54 +239,76 @@ function drawBackground() {
   }
 }
 
+const enemyImages = {
+  boar: boarWalkImg,
+};
+
 
 
 
 let initialEnemies = [
   {
+    type: "boar",
     maxHealth: 20,
     health: 20,
     x: 300,
     y: floor + height - 50,
-    width: 50,
-    height: 50,
-    speed: 1.5,
+    width: 80,
+    height: 80,
+    speed: 1,
     direction: 1,
     startX: 300,
     endX: 1000,
     vy: 0,
     grounded: true,
     lastHitTime: 0,
+    frameWidth: (192/4) - 0.5,
+    frameHeight: 32,
+    frameY: 0,
+    frameCount: 4,
+    currentFrame: 0,
   },
   {
+    type: "boar",
     maxHealth: 20,
     health: 20,
     x: 200,
-    y: 400-50,
-    width: 50,
-    height: 50,
-    speed: 1.5,
+    y: 400-height,
+    width: 80,
+    height: 80,
+    speed: 1,
     direction: -1,
     startX: 150,
     endX: 550,
     vy: 0,
     grounded: true,
     lastHitTime: 0,
+    frameWidth: (192/4)-0.5,
+    frameHeight: 32,
+    frameY: 0,
+    frameCount: 4,
+    currentFrame: 0,
   },
   {
+    type: "boar",
     maxHealth: 20,
     health: 20,
     x: 400,
-    y: 350-50,
-    width: 50,
-    height: 50,
-    speed: 1.5,
+    y: 350-height,
+    width: 80,
+    height: 80,
+    speed: 1,
     direction: 1,
     startX: 400,
     endX: 600,
     vy: 0,
     grounded: true,
     lastHitTime: 0,
+    frameWidth: (192/4)-0.5,
+    frameHeight: 32,
+    frameY: 0,
+    frameCount: 4,
+    currentFrame: 0,
   }
 
 ];
@@ -526,43 +551,28 @@ function updateChar() {
   drawBackground();
 
   if (!gameOver) {
-
     vx = 0;
     if (leftDown) vx = -speed;
     if (rightDown) vx = speed;
 
     x += vx;
-
     vy += gravity;
 
     isTouchingWall();
 
-    //wall sliding
     if (onWall && !grounded && vy > 0) {
       vy = wallSlideGravity;
-      if (vy > wallSlideMaxSpeed) {
-        vy = wallSlideMaxSpeed;
-      }
-      if (onWall){
-        if (wallDir === -1) {
-          x += 0.5;
-        } else if (wallDir === 1) {
-          x -= 0.5;
-        }
+      if (vy > wallSlideMaxSpeed) vy = wallSlideMaxSpeed;
+      if (onWall) {
+        if (wallDir === -1) x += 0.5;
+        else if (wallDir === 1) x -= 0.5;
       }
     }
 
-    // calculate intended positions
     let newX = x + vx;
     let newY = y + vy;
 
-    // horizontal collision
-    let horizontalRect = {
-      x: newX,
-      y: y,
-      width: width,
-      height: height
-    };
+    let horizontalRect = { x: newX, y, width, height };
 
     for (let i = 0; i < blocks.length; i++) {
       let borderRect = {
@@ -582,13 +592,7 @@ function updateChar() {
       }
     }
 
-    // vertical collision
-    let verticalRect = {
-      x: newX,
-      y: newY,
-      width: width,
-      height: height
-    };
+    let verticalRect = { x: newX, y: newY, width, height };
 
     grounded = false;
     for (let i = 0; i < blocks.length; i++) {
@@ -615,118 +619,143 @@ function updateChar() {
       }
     }
 
-    // update positions
     x = newX;
     y = newY;
 
-    // floor collision
     collision();
 
-      const centerX = canvas.width/ 2;
-
+    const centerX = canvas.width / 2;
     xScreen = x - scrollX;
 
     if (xScreen > centerX + 200) {
       scrollX += xScreen - (centerX + 200);
       xScreen = centerX + 200;
     }
-      if (xScreen < centerX - 200) {
-        scrollX += xScreen - (centerX - 200);
-        xScreen = centerX - 200;
+
+    if (xScreen < centerX - 200) {
+      scrollX += xScreen - (centerX - 200);
+      xScreen = centerX - 200;
     }
 
-
-    for (let i = 0; i < enemies.length; i++) {
-      const e = enemies[i];
-
-      // horizontal movement (path)
-      e.x += e.speed * e.direction;
-
-      // path boundaries (startX / endX)
-      if (e.x <= e.startX) {
-        e.direction = 1;
-      } else if (e.x + e.width >= e.endX) {
-        e.direction = -1;
-      }
-
-      // gravity
-      e.vy += gravity;
-      e.y += e.vy;
-
-      // reset grounded
-      e.grounded = false;
-
-      // check blocks for ground under enemy
-      for (let j = 0; j < blocks.length; j++) {
-        const b = blocks[j];
-
-        if (
-          e.x + e.width / 2 >= b.x - e.width / 2 &&
-          e.x + e.width / 2 <= b.x + b.width &&
-          e.y + e.height >= b.y &&
-          e.y + e.height <= b.y + b.height
-        ) {
-          e.y = b.y - e.height;
-          e.vy = 0;
-          e.grounded = true;
-        }
-      }
-
-      // floor collision for enemy
-      if (e.y + e.height >= canvas.height) {
-        e.y = canvas.height - e.height;
-        e.vy = 0;
-        e.grounded = true;
-      }
-    }
-
-    // enemy collision
-    enemyCollision();
-
-    // attack logic moved to keydown event
-
-    window.hitEnemiesThisFrame = window.hitEnemiesThisFrame || [];
-
-  const deadEnemies = [];
-  for (let i = 0; i < enemies.length; i++) {
-    if (enemies[i].health <= 0) {
-      deadEnemies.push(enemies[i]);
-    }
-  }
-  enemies = enemies.filter(e => e.health > 0);
-
-  ctx.fillStyle = "red";
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
-    ctx.fillRect(e.x - scrollX, e.y, e.width, e.height);
+    const img = enemyImages[e.type];
+
+    if (img && img.complete && img.naturalWidth > 0) {
+      const sx = e.currentFrame * e.frameWidth;
+      const sy = e.frameY;
+      const sw = e.frameWidth;
+      const sh = e.frameHeight;
+      const dw = e.width;
+      const dh = e.height;
+      const dx = e.x - scrollX;
+      const dy = e.y;
+
+      ctx.save();
+
+      if (e.direction === 1) {
+        ctx.translate(dx + dw, dy);
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh);
+      } else {
+        ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+      }
+
+      ctx.restore();
+    }
   }
 
+    enemyCollision();
+    enemies = enemies.filter(e => e.health > 0);
 
-    // draw blocks
     ctx.fillStyle = "black";
     for (let i = 0; i < blocks.length; i++) {
       const block = blocks[i];
       ctx.fillRect(block.x - scrollX, block.y, block.width, block.height);
     }
 
-    // draw enemies
-    ctx.fillStyle = "red";
     for (let i = 0; i < enemies.length; i++) {
-      const e = enemies[i];
-      ctx.fillRect(e.x - scrollX, e.y, e.width, e.height);
+    const e = enemies[i];
+
+    e.x += e.speed * e.direction;
+
+    if (e.x <= e.startX) e.direction = 1;
+    else if (e.x + e.width >= e.endX) e.direction = -1;
+
+    e.vy += gravity;
+    e.y += e.vy;
+
+    e.grounded = false;
+
+    for (let j = 0; j < blocks.length; j++) {
+      const b = blocks[j];
+      if (
+        e.x + e.width / 2 >= b.x - e.width / 2 &&
+        e.x + e.width / 2 <= b.x + b.width &&
+        e.y + e.height >= b.y &&
+        e.y + e.height <= b.y + b.height
+      ) {
+        e.y = b.y - e.height;
+        e.vy = 0;
+        e.grounded = true;
+      }
     }
 
-    //draw enemy health bars
+    if (e.y + e.height >= canvas.height) {
+      e.y = canvas.height - e.height;
+      e.vy = 0;
+      e.grounded = true;
+    }
+
+    e.frameTick = (e.frameTick || 0) + 1;
+    if (e.frameTick >= 10) {
+      e.currentFrame = (e.currentFrame + 1) % e.frameCount;
+      e.frameTick = 0;
+    }
+  }
+
+    ctx.fillStyle = "blue";
+    ctx.fillRect(xScreen, y, width, height);
+
+    if (rockImg.complete && rockImg.naturalWidth > 0) {
+      for (let i = 0; i < rocks.length; i++) {
+        const rock = rocks[i];
+        ctx.drawImage(
+          rockImg,
+          rockSprites[0].sx,
+          rockSprites[0].sy,
+          rockSprites[0].sw,
+          rockSprites[0].sh,
+          rock.x - scrollX,
+          rock.y,
+          rock.width,
+          rock.height
+        );
+      }
+    }
+
+    if (treeObjImg.complete && treeObjImg.naturalWidth > 0) {
+      for (let i = 0; i < trees.length; i++) {
+        const tree = trees[i];
+        ctx.drawImage(
+          treeObjImg,
+          treeSprites[0].sx,
+          treeSprites[0].sy,
+          treeSprites[0].sw,
+          treeSprites[0].sh,
+          tree.x - scrollX,
+          tree.y,
+          tree.width,
+          tree.height
+        );
+      }
+    }
+
     const now = Date.now();
-    const healthBarDuration = 2000; // show health bar for 2 seconds after being hit
-    
     for (let i = 0; i < enemies.length; i++) {
       const e = enemies[i];
-
       const timeSinceHit = now - e.lastHitTime;
-      const shouldShowHealthBar = timeSinceHit < healthBarDuration;
-
-      if (shouldShowHealthBar) {
+      if (timeSinceHit < 2000) {
         const barX = e.x - scrollX + e.width / 2;
         const barY = e.y - 20;
         const barWidth = 40;
@@ -745,65 +774,16 @@ function updateChar() {
       }
     }
 
-    if (isAttacking) {
-      setTimeout(() => {
-        window.hitEnemiesThisFrame = [];
-        isAttacking = false;
-      }, 100);
+    if (playerPortraitImg.complete && playerPortraitImg.naturalWidth > 0) {
+      ctx.strokeStyle = "darkgreen";
+      ctx.fillStyle = "rgba(0, 128, 0, 0.5)";
+      ctx.fillRect(12, 15, 70, 70);
+      ctx.drawImage(playerPortraitImg, 13, 16, 68, 68);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(12, 15, 70, 70, 10);
+      ctx.stroke();
     }
-
-    // draw player
-    ctx.fillStyle = "blue";
-    ctx.fillRect(xScreen, y, width, height);
-
-      // draw rocks
-    if (rockImg.complete && rockImg.naturalWidth > 0) {
-      for (let i = 0; i < rocks.length; i++) {
-        const rock = rocks[i];
-        ctx.drawImage(
-          rockImg,
-          rockSprites[0].sx,
-          rockSprites[0].sy,
-          rockSprites[0].sw,
-          rockSprites[0].sh,
-          rock.x - scrollX,
-          rock.y,
-          rock.width,
-          rock.height
-        );
-      }
-    }
-
-    // draw trees
-    if (treeObjImg.complete && treeObjImg.naturalWidth > 0) {
-      for (let i = 0; i < trees.length; i++) {
-        const tree = trees[i];
-        ctx.drawImage(
-          treeObjImg,
-          treeSprites[0].sx,
-          treeSprites[0].sy,
-          treeSprites[0].sw,
-          treeSprites[0].sh,
-          tree.x - scrollX,
-          tree.y,
-          tree.width,
-          tree.height
-        );
-      }
-    }
-
-      //draw player icon
-
-  if (playerPortraitImg.complete && playerPortraitImg.naturalWidth > 0) {
-    ctx.strokeStyle = "darkgreen";
-    ctx.fillStyle = "rgba(0, 128, 0, 0.5)";
-    ctx.fillRect(12, 15, 70, 70);
-    ctx.drawImage(playerPortraitImg, 13, 16, 68, 68);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(12, 15, 70, 70, 10);
-    ctx.stroke();
-  }
 
     ctx.strokeStyle = "darkgreen";
     ctx.fillStyle = "rgba(0, 128, 0, 0.5)";
@@ -813,38 +793,32 @@ function updateChar() {
     ctx.roundRect(95, 13, 300, 68, 10);
     ctx.stroke();
 
-    // draw health bar
-      const barWidth = 180;
+    const barWidth = 180;
     const barHeight = 32;
     const barX = 105;
     const barY = 35;
+    const radius = 8;
+    const healthPercent = health / maxHealth;
 
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barWidth, barHeight, radius);
+    ctx.fillStyle = "red";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barWidth * healthPercent, barHeight, radius);
+    ctx.fillStyle = "lime";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barWidth, barHeight, radius);
+    ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
-
-  const radius = 8;
-  const healthPercent = health / maxHealth;
-
-  ctx.save();
-
-  ctx.beginPath();
-  ctx.roundRect(barX, barY, barWidth, barHeight, radius);
-  ctx.fillStyle = "red";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.roundRect(barX, barY, barWidth * healthPercent, barHeight, radius);
-  ctx.fillStyle = "lime";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.roundRect(barX, barY, barWidth, barHeight, radius);
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  ctx.restore();
+    ctx.stroke();
+    ctx.restore();
   } else {
-  drawGameOver();
+    drawGameOver();
   }
 
   requestAnimationFrame(updateChar);
