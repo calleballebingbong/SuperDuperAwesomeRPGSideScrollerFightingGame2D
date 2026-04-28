@@ -667,6 +667,7 @@ if (rightDown) {
     vx = 0;
     if (leftDown) vx = -speed;
     if (rightDown) vx = speed;
+    if (attacking) vx = 0;
 
     x += vx;
     vy += gravity;
@@ -935,8 +936,10 @@ if (rightDown) {
 if (spriteSheet.naturalWidth > 0) {
 
 
-
-if (currentAnim === animations.attack) {
+if (currentAnim === animations.run) {
+  spriteDrawWidth = currentAnim.frameWidth * 2.5;
+  spriteOffsetX = -20;
+} else if (currentAnim === animations.attack) {
   spriteDrawWidth = currentAnim.frameWidth * 2.5;
   spriteOffsetX = -30;
 } else if (onWall) {
@@ -1012,11 +1015,11 @@ function updateAnimation() {
       }
     }
   }
-  else if (vx !== 0) {
-    setAnimation("run");
-  }
   else if (attacking) {
     setAnimation("attack");
+  }
+  else if (vx !== 0) {
+    setAnimation("run");
   }
   else {
     setAnimation("idle");
