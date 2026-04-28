@@ -1,6 +1,12 @@
 addEventListener("keydown", function(e) {
     if (e.code === "KeyD") rightDown = true;
     if (e.code === "KeyA") leftDown = true;
+    if (e.code === "KeyL") {
+        const now = Date.now();
+        if (now - lastAttackTime >= attackCooldown) {
+            playerAttack();
+        }
+    }
 
     if (e.code === "KeyW" || e.code === "Space") {
         if (jumpCount < maxJumps) {
@@ -21,4 +27,10 @@ addEventListener("keyup", function(e) {
     if (e.code === "KeyD") rightDown = false;
     if (e.code === "KeyA") leftDown = false;
     if (e.code === "KeyW" || e.code === "Space") jumpKeyRelease = true;
+});
+
+document.addEventListener("keydown", (e) => {
+    if (gameOver && e.key.toLowerCase()=== 'r'){
+        resetGame();
+    }
 });
