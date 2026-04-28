@@ -44,7 +44,7 @@ let jumpKeyRelease = true;
 let invincible = false;
 let maxHealth = 100;
 let health = maxHealth;
-let damageCooldown = 500; //ms
+let damageCooldown = 100; //ms
 let lastDamageTime = 0;
 
 let playerDamage = 10;
@@ -93,6 +93,13 @@ const animations = {
     frames: 3,
     loop: false,
     frameWidth: 192 / 3
+  },
+  dead: {
+    src: "fantasy/Character/Dead/Dead-Sheet.png",
+    frames: 8,
+    loop: false,
+    frameWidth: 640 / 8
+    
   }
 };
 
@@ -998,9 +1005,13 @@ if (frameTimer >= frameDelay) {
     }
   }
 }
-function updateAnimation() {
-  if (!grounded) {
 
+function updateAnimation() {
+  if (gameOver) {
+    setAnimation("dead");
+    return;
+  }
+  if (!grounded) {
     // going UP
     if (vy < 0) {
       if (currentAnim !== animations.jumpStart) {
@@ -1015,12 +1026,13 @@ function updateAnimation() {
       }
     }
   }
+  
   else if (attacking) {
     setAnimation("attack");
   }
   else if (vx !== 0) {
     setAnimation("run");
-  }
+  } 
   else {
     setAnimation("idle");
   }
