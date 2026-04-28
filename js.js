@@ -26,7 +26,11 @@ let maxJumps = 2;
 let gameOver = false;
 
 const width = 50;
-const height = 100;
+const height = 150;
+const offsetY = -10;
+const offsetX = 10;
+
+
 const gravity = 1;
 const speed = 5;
 const floor = canvas.height - height;
@@ -48,6 +52,105 @@ const playerRange = 50; // range of player attack
 let isAttacking = false;
 let attackCooldown = 250; // ms
 let lastAttackTime = 0;
+
+// animation variables:
+let frameTimer = 0;
+let frameDelay = 5; // higher = slower animation
+let spriteDrawWidth = 150;
+let spriteDrawHeight = 200;
+let spriteX = -spriteDrawWidth / 2
+let spriteOffsetX = 0;
+let facingLeft = false;
+
+
+const animations = {
+  idle: {
+    src: "fantasy/Character/Idle/Idle-Sheet.png",
+    frames: 4,
+    loop: true,
+    frameWidth: 256 / 4
+  },
+  run: {
+    src: "fantasy/Character/Run/Run-Sheet.png",
+    frames: 8,
+    loop: true,
+    frameWidth: 640 / 8
+  },
+  attack: {
+    src: "fantasy/Character/Attack-01/Attack-01-Sheet.png",
+    frames: 8,
+    loop: false,
+    frameWidth: 768 / 8
+  },
+  jumpStart: {
+    src: "fantasy/Character/Jump-Start/Jump-Start-Sheet.png",
+    frames: 4,
+    loop: false,
+    frameWidth: 256 / 4
+  },
+  jumpEnd: {
+    src: "fantasy/Character/Jump-End/Jump-End-Sheet.png",
+    frames: 3,
+    loop: false,
+    frameWidth: 192 / 3
+  }
+};
+
+
+
+const spriteImages = {
+  idle: new Image(),
+  run: new Image(),
+  attack: new Image(),
+  jumpStart: new Image(),
+  jumpEnd: new Image()
+};
+
+spriteImages.idle.src = animations.idle.src;
+spriteImages.run.src = animations.run.src;
+spriteImages.attack.src = animations.attack.src;
+spriteImages.jumpStart.src = animations.jumpStart.src;
+spriteImages.jumpEnd.src = animations.jumpEnd.src;
+const spriteSheet = new Image();
+
+let currentAnim = null;
+let frameIndex = 0;
+
+let spriteWidth = 0;
+const spriteHeight = 64;
+
+let imageLoaded = false;
+
+currentAnim = animations.idle;
+setAnimation("idle");
+
+function setAnimation(name) {
+  const anim = animations[name];
+  if (!anim || currentAnim === anim) return;
+
+  currentAnim = anim;
+  frameIndex = 0;
+  imageLoaded = false;
+
+  spriteSheet.onload = () => {
+    imageLoaded = true;
+  };
+
+  spriteSheet.src = anim.src;
+  spriteWidth = anim.frameWidth;
+}
+
+attacking = false;
+document.addEventListener("keydown", (event) => {
+  if (event.code === "KeyL") {
+    attacking = true;
+  }
+
+  if (event.code === "Space") {
+    setAnimation("jump");
+  }
+});
+
 
 const boarWalkImg = new Image();
 boarWalkImg.src = "fantasy/Mob/Boar/Walk/Walk-Base-Sheet.png";
@@ -548,6 +651,16 @@ playerPortraitImg.src = "fantasy/portraits/playerIcon.png";
 function updateChar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+if (leftDown) {
+  vx = -speed;
+  facingLeft = true;
+}
+
+if (rightDown) {
+  vx = speed;
+  facingLeft = false;
+}
+
   drawBackground();
 
   if (!gameOver) {
@@ -714,8 +827,6 @@ function updateChar() {
     }
   }
 
-    ctx.fillStyle = "blue";
-    ctx.fillRect(xScreen, y, width, height);
 
     if (rockImg.complete && rockImg.naturalWidth > 0) {
       for (let i = 0; i < rocks.length; i++) {
@@ -820,7 +931,98 @@ function updateChar() {
   } else {
     drawGameOver();
   }
+  
+if (spriteSheet.naturalWidth > 0) {
 
+
+
+if (currentAnim === animations.attack) {
+  spriteDrawWidth = currentAnim.frameWidth * 2.5;
+  spriteOffsetX = -30;
+} else if (onWall) {
+  spriteOffsetX = 20;
+}
+else {
+  spriteDrawWidth = 150;
+  spriteOffsetX = 0;
+}
+
+ctx.save();
+
+// sprite anchor = CENTER of hitbox
+const centerX = xScreen + width / 2;
+
+// flip if facing left
+if (facingLeft) {
+  ctx.translate(centerX, 0);
+  ctx.scale(-1, 1);
+} else {
+  ctx.translate(centerX, 0);
+}
+
+// ALWAYS draw sprite centered on same anchor
+ctx.drawImage(
+  spriteSheet,
+  frameIndex * spriteWidth,
+  0,
+  spriteWidth,
+  spriteHeight,
+  spriteX + spriteOffsetX,
+  y + height - spriteDrawHeight,
+  spriteDrawWidth,
+  spriteDrawHeight
+);
+
+
+ctx.restore();
+}
+// DEBUG HITBOX
+ctx.strokeStyle = "lime";
+ctx.lineWidth = 2;
+ctx.strokeRect(xScreen, y, width, height);
+
+frameTimer++;
+
+if (frameTimer >= frameDelay) {
+  frameTimer = 0;
+  frameIndex++;
+  if (frameIndex >= currentAnim.frames) {
+    if (currentAnim.loop) {
+      frameIndex = 0;
+    } else {
+      frameIndex = currentAnim.frames - 1; // hold last frame
+      attacking = false; // reset attack state after animation finishes
+    }
+  }
+}
+function updateAnimation() {
+  if (!grounded) {
+
+    // going UP
+    if (vy < 0) {
+      if (currentAnim !== animations.jumpStart) {
+        setAnimation("jumpStart");
+      }
+    }
+
+    // going DOWN
+    else if (vy > 0) {
+      if (currentAnim !== animations.jumpEnd && onWall == false) {
+        setAnimation("jumpEnd");
+      }
+    }
+  }
+  else if (vx !== 0) {
+    setAnimation("run");
+  }
+  else if (attacking) {
+    setAnimation("attack");
+  }
+  else {
+    setAnimation("idle");
+  }
+}
+updateAnimation();
   requestAnimationFrame(updateChar);
 }
 
