@@ -4,6 +4,7 @@ addEventListener("keydown", function(e) {
     if (e.code === "KeyL") {
         const now = Date.now();
         if (now - lastAttackTime >= attackCooldown) {
+            attacking = true;
             playerAttack();
         }
     }
