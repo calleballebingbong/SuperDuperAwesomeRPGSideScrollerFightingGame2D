@@ -153,8 +153,8 @@ function updateChar() {
       scrollX += xScreen - (centerX - 200);
       xScreen = centerX - 200;
     }
-
     drawEnemies();
+    drawPlayer();
     enemyCollision();
     enemies = enemies.filter(e => e.health > 0);
 
@@ -166,7 +166,7 @@ function updateChar() {
     drawGameOver();
   }
 
-  drawPlayer();
+
   updateAnimation();
   updateEnemies();
 

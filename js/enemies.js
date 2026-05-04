@@ -136,7 +136,11 @@ function drawEnemies() {
         ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
       }
 
+      
       ctx.restore();
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(dx, dy, dw, dh);
     }
   }
 
