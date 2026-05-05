@@ -153,6 +153,8 @@ function updateChar() {
       scrollX += xScreen - (centerX - 200);
       xScreen = centerX - 200;
     }
+
+    updateAnimation();
     drawEnemies();
     drawPlayer();
     enemyCollision();
@@ -163,11 +165,11 @@ function updateChar() {
 
     drawHUD();
   } else {
+    updateAnimation();
+    drawPlayer();
     drawGameOver();
   }
 
-
-  updateAnimation();
   updateEnemies();
 
   requestAnimationFrame(updateChar);

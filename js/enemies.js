@@ -1,5 +1,8 @@
 const enemyImages = {
-  boar: boarWalkImg,
+  boar: {
+    walk: boarWalkImg,
+    run: boarRunImg
+  }
 };
 
 let initialEnemies = [
@@ -12,7 +15,11 @@ let initialEnemies = [
     width: 80,
     height: 80,
     speed: 1,
+    chaseSpeed: 2.5,
     direction: 1,
+    state: "patrol",
+    detectRange: 300,
+    attackRange: 70,
     startX: 300,
     endX: 1000,
     vy: 0,
@@ -23,6 +30,7 @@ let initialEnemies = [
     frameY: 0,
     frameCount: 4,
     currentFrame: 0,
+    frameTick: 0
   },
   {
     type: "boar",
@@ -33,7 +41,11 @@ let initialEnemies = [
     width: 80,
     height: 80,
     speed: 1,
+    chaseSpeed: 2.5,
     direction: -1,
+    state: "patrol",
+    detectRange: 300,
+    attackRange: 70,
     startX: 150,
     endX: 550,
     vy: 0,
@@ -44,6 +56,7 @@ let initialEnemies = [
     frameY: 0,
     frameCount: 4,
     currentFrame: 0,
+    frameTick: 0,
   },
   {
     type: "boar",
@@ -54,7 +67,11 @@ let initialEnemies = [
     width: 80,
     height: 80,
     speed: 1,
+    chaseSpeed: 2.5,
     direction: 1,
+    state: "patrol",
+    detectRange: 300,
+    attackRange: 70,
     startX: 400,
     endX: 600,
     vy: 0,
@@ -65,6 +82,7 @@ let initialEnemies = [
     frameY: 0,
     frameCount: 4,
     currentFrame: 0,
+    frameTick: 0
   }
 ];
 
@@ -73,10 +91,29 @@ let enemies = structuredClone(initialEnemies);
 function updateEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
-    e.x += e.speed * e.direction;
 
-    if (e.x <= e.startX) e.direction = 1;
-    else if (e.x + e.width >= e.endX) e.direction = -1;
+    const px = x;
+    const py = y;
+
+    const dx = px - e.x;
+    const dy = py - e.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < e.detectRange) {
+      e.state = "chase";
+    } else {
+      e.state = "patrol";
+    }
+
+    if (e.state === "chase") {
+      e.direction = dx >= 0 ? 1 : -1;
+      e.x += e.chaseSpeed * e.direction;
+    } else {
+      e.x += e.speed * e.direction;
+
+      if (e.x <= e.startX) e.direction = 1;
+      else if (e.x + e.width >= e.endX) e.direction = -1;
+    }
 
     e.vy += gravity;
     e.y += e.vy;
@@ -104,7 +141,7 @@ function updateEnemies() {
     }
 
     e.frameTick = (e.frameTick || 0) + 1;
-    if (e.frameTick >= 10) {
+    if (e.frameTick >= (e.state === "chase" ? 6 : 10)) {
       e.currentFrame = (e.currentFrame + 1) % e.frameCount;
       e.frameTick = 0;
     }
@@ -114,7 +151,7 @@ function updateEnemies() {
 function drawEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
-    const img = enemyImages[e.type];
+    const img = enemyImages[e.type] && enemyImages[e.type][e.state === "chase" ? "run" : "walk"];
 
     if (img && img.complete && img.naturalWidth > 0) {
       const sx = e.currentFrame * e.frameWidth;
