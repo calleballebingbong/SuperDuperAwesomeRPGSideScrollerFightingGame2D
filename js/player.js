@@ -14,6 +14,7 @@ let lastDamageTime = 0;
 let isAttacking = false;
 let lastAttackTime = 0;
 
+
 // Animation variables
 let frameTimer = 0;
 let facingLeft = false;
@@ -84,6 +85,7 @@ function setAnimation(name) {
 }
 
 function updateAnimation() {
+  
   if (gameOver) {
     setAnimation("dead");
     return;

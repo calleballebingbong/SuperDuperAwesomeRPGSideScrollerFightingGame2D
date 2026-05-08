@@ -233,7 +233,7 @@ function enemyCollision() {
       py < ey + eh
     ){
       if (!invincible) {
-        health -= 0;
+        health -= playerDamage;
         invincible = true;
         lastDamageTime = now;
 

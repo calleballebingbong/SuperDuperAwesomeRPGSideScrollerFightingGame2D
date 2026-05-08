@@ -50,7 +50,21 @@ function resetGame() {
 function updateChar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (leftDown) {
+
+  if (dash){
+    if(leftDown){
+      vx = -dashSpeed;
+      vy = 0;
+    } else if(rightDown) {
+      vx = dashSpeed;
+      vy = 0;
+    }
+
+    if(Date.now() - dashStartTime > dashDuration){
+      dash = false;
+    }
+  } else{
+      if (leftDown) {
     vx = -speed;
     facingLeft = true;
   }
@@ -59,6 +73,11 @@ function updateChar() {
     vx = speed;
     facingLeft = false;
   }
+  }
+
+    console.log(vx)
+    x += vx;
+    vy += gravity;
 
   drawBackground();
 
@@ -68,8 +87,6 @@ function updateChar() {
     if (rightDown) vx = speed;
     if (attacking) vx = 0;
 
-    x += vx;
-    vy += gravity;
 
     isTouchingWall();
 

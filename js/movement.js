@@ -8,7 +8,16 @@ addEventListener("keydown", function(e) {
             playerAttack();
         }
     }
-    
+    if (e.code === "ShiftLeft") {
+        const now = Date.now();
+
+        if (!dash && now - lastDashTime > dashCooldown){
+            dash = true;
+            console.log(dash)
+            dashStartTime = now;
+            lastDashTime = now;
+        }
+    }
 
     if (e.code === "KeyW" || e.code === "Space") {
         if (jumpCount < maxJumps) {
@@ -30,6 +39,8 @@ addEventListener("keyup", function(e) {
     if (e.code === "KeyA") leftDown = false;
     if (e.code === "KeyW" || e.code === "Space") jumpKeyRelease = true;
     if (e.code === "KeyR") resetGame();
+
+
 });
 
 document.addEventListener("keydown", (e) => {

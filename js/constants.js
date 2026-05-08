@@ -9,10 +9,18 @@ const wallSlideGravity = 2;
 const wallSlideMaxSpeed = 4;
 const maxJumps = 2;
 const maxHealth = 100;
-const damageCooldown = 500; // ms
+const damageCooldown = 250; // ms
 const playerDamage = 5;
 const playerRange = 50; // range of player attack
 const attackCooldown = 250; // ms
+
+// Movement constant for dash
+let dash = false;
+let dashSpeed = 20;
+let dashDuration = 150; //ms
+let dashCooldown = 500; //ms
+let dashStartTime = 0;
+let lastDashTime = 0;
 
 // Animation constants
 const frameDelay = 5; // higher = slower animation
