@@ -177,7 +177,7 @@ function drawEnemies() {
       ctx.restore();
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
-        ctx.strokeRect(dx, dy, dw, dh);
+  ctx.strokeRect(e.x - scrollX,e.y,e.width,e.height)
     }
   }
 
@@ -227,7 +227,7 @@ function enemyCollision() {
       py < ey + eh
     ){
       if (!invincible) {
-        health -= 10;
+        health -= 0;
         invincible = true;
         lastDamageTime = now;
 

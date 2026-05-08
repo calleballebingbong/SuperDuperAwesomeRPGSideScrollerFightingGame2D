@@ -23,6 +23,8 @@ let spriteWidth = 0;
 let spriteOffsetX = 0;
 let imageLoaded = false;
 let attacking = false;
+let attackHitBoxWidth = 150;
+let attackHitBoxHeight = spriteDrawHeight - 50;
 
 const animations = {
   idle: {
@@ -102,6 +104,14 @@ function updateAnimation() {
   }
   else if (attacking) {
     setAnimation("attack");
+    const ax = facingLeft ? x - attackHitBoxWidth : x + width;
+    const ay = y;
+    const aw = attackHitBoxWidth;
+    const ah = attackHitBoxHeight;
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ax - scrollX, ay, aw, ah);
+
   }
   else if (vx !== 0) {
     setAnimation("run");
@@ -159,6 +169,8 @@ function drawPlayer() {
   ctx.lineWidth = 2;
   ctx.strokeRect(xScreen, y, width, height);
 
+ 
+
   frameTimer++;
   if (frameTimer >= frameDelay) {
     frameTimer = 0;
@@ -192,9 +204,18 @@ function playerAttack() {
     const pw = width;
     const ph = height;
 
-    if (px + pw + playerRange > ex &&
-      px - playerRange < ex + ew &&
-      py + ph > ey && py < ey + eh) {
+    const ax = facingLeft ? x - attackHitBoxWidth : x + width;
+    const ay = y;
+    const aw = attackHitBoxWidth;
+    const ah = attackHitBoxHeight;
+
+    if (ax + aw > ex &&
+      ax < ex + ew &&
+      ay + ah > ey &&
+      ay < ey + eh
+    ){
+      console.log("attack Sucess")
+      console.log("collision box:" + ax,ay)
       e.health -= playerDamage;
       e.lastHitTime = now;
       hitThisFrame.add(i);

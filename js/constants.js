@@ -9,8 +9,8 @@ const wallSlideGravity = 2;
 const wallSlideMaxSpeed = 4;
 const maxJumps = 2;
 const maxHealth = 100;
-const damageCooldown = 100; // ms
-const playerDamage = 10;
+const damageCooldown = 500; // ms
+const playerDamage = 5;
 const playerRange = 50; // range of player attack
 const attackCooldown = 250; // ms
 
