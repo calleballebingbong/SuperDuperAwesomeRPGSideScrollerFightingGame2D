@@ -19,6 +19,9 @@ const boarWalkImg = new Image();
 boarWalkImg.src = "fantasy/Mob/Boar/Walk/Walk-Base-Sheet.png";
 const boarRunImg = new Image();
 boarRunImg.src = "fantasy/Mob/Boar/Run/Run-Sheet.png"; 
+const boarHitImg = new Image();
+boarHitImg.src = "fantasy/Mob/Boar/Hit-Vanish/Hit-Sheet.png"; 
+
 
 // Object images
 const treeObjImg = new Image();

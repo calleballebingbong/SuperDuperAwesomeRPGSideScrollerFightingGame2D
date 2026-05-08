@@ -1,7 +1,8 @@
 const enemyImages = {
   boar: {
     walk: boarWalkImg,
-    run: boarRunImg
+    run: boarRunImg,
+    hit: boarHitImg,
   }
 };
 
@@ -149,9 +150,15 @@ function updateEnemies() {
 }
 
 function drawEnemies() {
+  const now = Date.now();
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
-    const img = enemyImages[e.type] && enemyImages[e.type][e.state === "chase" ? "run" : "walk"];
+    const timeSinceHit = now - e.lastHitTime;
+    let animState = e.state === "chase" ? "run" : "walk";
+    if (timeSinceHit < 300) {
+      animState = "hit";
+    }
+    const img = enemyImages[e.type] && enemyImages[e.type][animState];
 
     if (img && img.complete && img.naturalWidth > 0) {
       const sx = e.currentFrame * e.frameWidth;
@@ -177,12 +184,11 @@ function drawEnemies() {
       ctx.restore();
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
-  ctx.strokeRect(e.x - scrollX,e.y,e.width,e.height)
+  ctx.strokeRect(e.x - scrollX,e.y,e.width,e.height);
     }
   }
 
   // Enemy health bars
-  const now = Date.now();
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
     const timeSinceHit = now - e.lastHitTime;
