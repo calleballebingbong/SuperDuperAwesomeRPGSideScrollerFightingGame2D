@@ -49,8 +49,6 @@ function resetGame() {
 
 function updateChar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-
   if (dash){
     if(leftDown){
       vx = -dashSpeed;

@@ -1,3 +1,4 @@
+let dmgDisplay =[];
 // Player variables
 let x = 0;
 let y = 0;
@@ -85,6 +86,20 @@ function setAnimation(name) {
 }
 
 function updateAnimation() {
+
+  //Display damage numbers when attacking enemy
+  for (let i = 0; i < dmgDisplay.length; i++) {
+  const arr = dmgDisplay[i];
+  arr.y -= 1; // Move damage text up
+  ctx.fillStyle = "red";
+  ctx.font = "20px Arial";
+  ctx.fillText(arr.damage, arr.x - scrollX, arr.y);
+
+  if (Date.now() - arr.time > 1000) {
+    dmgDisplay.splice(i, 1);
+    i--;
+  }
+}
   
   if (gameOver) {
     setAnimation("dead");
@@ -221,6 +236,7 @@ function playerAttack() {
     ){
       console.log("attack Sucess")
       console.log("collision box:" + ax,ay)
+      dmgDisplay.push({x: ex, y: ey, damage: playerDamage, time: Date.now()});
       e.health -= playerDamage;
       e.lastHitTime = now;
       hitThisFrame.add(i);
