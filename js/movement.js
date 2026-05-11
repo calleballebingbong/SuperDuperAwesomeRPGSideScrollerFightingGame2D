@@ -1,14 +1,16 @@
 addEventListener("keydown", function(e) {
-    if (e.code === "KeyD") rightDown = true;
-    if (e.code === "KeyA") leftDown = true;
-    if (e.code === "KeyL") {
+    const action = e.code;
+    if (action === "KeyB"){showHitboxes = !showHitboxes;}
+    if (action === "KeyD") rightDown = true;
+    if (action === "KeyA") leftDown = true;
+    if (action === "KeyL") {
         const now = Date.now();
         if (now - lastAttackTime >= attackCooldown) {
             attacking = true;
             playerAttack();
         }
     }
-    if (e.code === "ShiftLeft") {
+    if (action === "ShiftLeft") {
         const now = Date.now();
 
         if (!dash && now - lastDashTime > dashCooldown){
@@ -19,7 +21,7 @@ addEventListener("keydown", function(e) {
         }
     }
 
-    if (e.code === "KeyW" || e.code === "Space") {
+    if (action === "KeyW" || action === "Space") {
         if (jumpCount < maxJumps) {
             vy = -20;
             grounded = false;
@@ -32,6 +34,7 @@ addEventListener("keydown", function(e) {
             jumpKeyRelease = false;
         }
     }
+
 });
 
 addEventListener("keyup", function(e) {

@@ -182,9 +182,13 @@ function drawEnemies() {
 
       
       ctx.restore();
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
+
+  // Enemy hitboxes for debugging
+  if (showHitboxes) {
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
   ctx.strokeRect(e.x - scrollX,e.y,e.width,e.height);
+  }
     }
   }
 

@@ -106,6 +106,7 @@ function updateAnimation() {
   }
   else if (attacking) {
     setAnimation("attack");
+    if (showHitboxes) {
     const ax = facingLeft ? x - attackHitBoxWidth : x + width;
     const ay = y;
     const aw = attackHitBoxWidth;
@@ -113,7 +114,7 @@ function updateAnimation() {
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 2;
     ctx.strokeRect(ax - scrollX, ay, aw, ah);
-
+    }
   }
   else if (vx !== 0) {
     setAnimation("run");
@@ -167,9 +168,11 @@ function drawPlayer() {
   }
 
   // DEBUG HITBOX
+  if (showHitboxes) {
   ctx.strokeStyle = "lime";
   ctx.lineWidth = 2;
   ctx.strokeRect(xScreen, y, width, height);
+  }
 
  
 

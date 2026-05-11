@@ -14,6 +14,9 @@ const playerDamage = 5;
 const playerRange = 50; // range of player attack
 const attackCooldown = 250; // ms
 
+//Disable/enable hitboxes for debugging
+let showHitboxes = false;
+
 // Movement constant for dash
 let dash = false;
 let dashSpeed = 20;
