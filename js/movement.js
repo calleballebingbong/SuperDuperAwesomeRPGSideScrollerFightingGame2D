@@ -1,6 +1,7 @@
 addEventListener("keydown", function(e) {
     const action = e.code;
     if (action === "KeyB"){showHitboxes = !showHitboxes;}
+    if (action === "KeyN") {invincible = !invincible;}
     if (action === "KeyD") rightDown = true;
     if (action === "KeyA") leftDown = true;
     if (action === "KeyL") {

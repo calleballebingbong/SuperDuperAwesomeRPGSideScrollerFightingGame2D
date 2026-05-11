@@ -236,8 +236,9 @@ function enemyCollision() {
       py + ph > ey &&
       py < ey + eh
     ){
+      //Player collision with enemy
       if (!invincible) {
-        health -= playerDamage;
+        health -= boarDamage;
         invincible = true;
         lastDamageTime = now;
 

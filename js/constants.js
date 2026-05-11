@@ -9,12 +9,14 @@ const wallSlideGravity = 2;
 const wallSlideMaxSpeed = 4;
 const maxJumps = 2;
 const maxHealth = 100;
-const damageCooldown = 250; // ms
+const damageCooldown = 500; // ms
 let playerDamage = 5;
+let boarDamage = 10;
 const playerRange = 50; // range of player attack
-const attackCooldown = 250; // ms
+const attackCooldown = 750; // ms
 
-//Disable/enable hitboxes for debugging
+//Disable/enable hitboxes and shows more information for debugging
+let immune = false;
 let showHitboxes = false;
 
 // Movement constant for dash
