@@ -34,7 +34,8 @@ addEventListener("keydown", function(e) {
             jumpKeyRelease = false;
         }
     }
-
+    if (action === "KeyT") {playerDamage += 5;}
+    if (action === "KeyY") {playerDamage -= 5;}
 });
 
 addEventListener("keyup", function(e) {

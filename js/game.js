@@ -25,6 +25,7 @@ if (!ctx) {
 canvas.focus();
 
 function resetGame() {
+  playerDamage = 5;
   x = 0;
   y = 0;
   scrollX = 0;

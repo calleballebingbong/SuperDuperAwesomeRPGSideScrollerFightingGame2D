@@ -86,7 +86,11 @@ function setAnimation(name) {
 }
 
 function updateAnimation() {
-
+  //Display player damage (top right corner)
+  ctx.fillStyle = "blue";
+  ctx.font = "20px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(`Damage: ${playerDamage}`,canvas.width - 10,20);
   //Display damage numbers when attacking enemy
   for (let i = 0; i < dmgDisplay.length; i++) {
   const arr = dmgDisplay[i];
