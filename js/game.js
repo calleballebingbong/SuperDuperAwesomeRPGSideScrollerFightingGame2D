@@ -78,7 +78,6 @@ function updateChar() {
     x += vx;
     vy += gravity;
 
-  drawBackground();
 
   if (!gameOver) {
     vx = 0;
@@ -170,6 +169,7 @@ function updateChar() {
       xScreen = centerX - 200;
     }
 
+    drawBackground();
     updateAnimation();
     drawEnemies();
     drawPlayer();

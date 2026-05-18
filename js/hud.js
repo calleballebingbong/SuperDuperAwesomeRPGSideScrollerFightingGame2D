@@ -50,6 +50,27 @@ function drawHUD() {
   ctx.lineWidth = 1;
   ctx.stroke();
   ctx.restore();
+  
+  // DEBUG HITBOX PLAYER
+  if (showHitboxes) {
+  ctx.strokeStyle = "lime";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(xScreen, y, width, height);
+
+  //Display game variables (top right corner)
+  ctx.fillStyle = "blue";
+  ctx.font = "20px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(`DMG up/down: T/Y, invincible N: ${invincible}`,canvas.width,20);
+  ctx.fillText(`PlayerDamage: ${playerDamage}, PlayerHealth: ${health}`,canvas.width,40);
+  ctx.fillText(`BoarDamage: ${boarDamage}`,canvas.width,60);
+  ctx.fillText(`Grounded: ${grounded}, OnWall: ${onWall}`,canvas.width,80);
+  } if (!showHitboxes){
+      ctx.fillStyle = "red";
+      ctx.font = "20px Arial";
+      ctx.textAlign = "right";
+      ctx.fillText(`Debug Info: B`,canvas.width,20);
+  }
 }
 
 function drawGameOver() {

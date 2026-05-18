@@ -133,12 +133,6 @@ function updateEnemies() {
     const dy = py - e.y;
     const dist = Math.hypot(dx, dy);
 
-    if (e.type !== "snail" && dist < e.detectRange) {
-      e.state = "chase";
-    } else {
-      e.state = "patrol";
-    }
-
     if (e.state === "chase") {
       e.direction = dx >= 0 ? 1 : -1;
       e.x += e.chaseSpeed * e.direction;
@@ -226,6 +220,19 @@ function drawEnemies() {
   ctx.strokeStyle = "red";
   ctx.lineWidth = 2;
   ctx.strokeRect(e.x - scrollX,e.y,e.width,e.height);
+
+  const detectBoxX = e.x - scrollX - e.detectRange + e.width;
+  const detectBoxWidth = 2*e.detectRange - e.width;
+
+  if (e.state === "chase") {
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(detectBoxX,e.y,detectBoxWidth,e.height);
+  } else if (e.state === "patrol") {
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(detectBoxX,e.y,detectBoxWidth,e.height);
+  }
   }
     }
   }
@@ -269,6 +276,11 @@ function enemyCollision() {
     const pw = width;
     const ph = height;
 
+    const dx = e.x - e.detectRange + e.width;
+    const dy = e.y;
+    const dw = 2*e.detectRange - e.width;
+    const dh = e.height;
+    
     if (px + pw > ex &&
       px < ex + ew &&
       py + ph > ey &&
@@ -290,5 +302,16 @@ function enemyCollision() {
         gameOver = true;
       }
     }
+
+    if (px + pw > dx &&
+      px < dx + dw &&
+      py + ph > dy &&
+      py < dy + dh
+    ){
+      e.state = "chase";
+    } else {
+      e.state = "patrol";
+    }
+
   }
 }
