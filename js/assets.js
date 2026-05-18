@@ -54,3 +54,21 @@ playerPortraitImg.src = "fantasy/portraits/playerIcon.png";
 //npc
 const merchantIdleImg = new Image();
 merchantIdleImg.src = "fantasy/npc/Charaters/NPC Merchant-idle.png";
+
+// Audio files
+const bgForestMusic = new Audio("audio/forest.mp3");
+bgForestMusic.loop = true;
+bgForestMusic.volume = 0.3;
+
+const windSound = new Audio("audio/wind.mp3");
+windSound.loop = true;
+windSound.volume = 0.1;
+
+const birdChirpSound = new Audio("audio/birds.mp3");
+birdChirpSound.volume = 0.1;
+
+const walkingSound = new Audio("audio/walking.mp3");
+walkingSound.volume = 0.2;
+
+const speak1Sound = new Audio("audio/speak_1.MP3");
+speak1Sound.volume = 0.15;

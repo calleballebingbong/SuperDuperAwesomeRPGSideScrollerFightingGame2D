@@ -227,6 +227,13 @@ function playerAttack() {
     ){
       console.log("attack Sucess")
       console.log("collision box:" + ax,ay)
+      
+      const now = Date.now();
+      const timeSinceHit = now - e.lastHitTime;
+      if (e.type === "snail" && timeSinceHit < (e.hitDuration || 1000)) {
+        continue;
+      }
+      
       dmgDisplay.push({x: ex, y: ey, damage: playerDamage, time: Date.now()});
       e.health -= playerDamage;
       e.lastHitTime = now;

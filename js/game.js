@@ -24,6 +24,23 @@ if (!ctx) {
 // Focus the canvas for keyboard input
 canvas.focus();
 
+// Bird chirp scheduler
+let birdChirpScheduled = false;
+function startBirdChirps() {
+  function schedule() {
+    const min = 5000; // 5s
+    const max = 30000; // 60s
+    const delay = Math.floor(Math.random() * (max - min) + min);
+    setTimeout(() => {
+      if (!gameOver) {
+        try { birdChirpSound.currentTime = 0; birdChirpSound.play(); } catch (e) {}
+      }
+      schedule();
+    }, delay);
+  }
+  schedule();
+}
+
 function resetGame() {
   playerDamage = 5;
   x = 0;
@@ -49,6 +66,11 @@ function resetGame() {
 }
 
 function updateChar() {
+  if (bgForestMusic.paused) {
+    bgForestMusic.play();
+    windSound.play();
+  }
+  if (!birdChirpScheduled) { birdChirpScheduled = true; startBirdChirps(); }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (dash){
     if(leftDown){
@@ -91,6 +113,16 @@ function updateChar() {
     if (rightDown) vx = speed;
     if (attacking) vx = 0;
 
+    // Play walking sound if moving and grounded
+    if (vx !== 0 && grounded) {
+      if (walkingSound.paused) {
+        walkingSound.loop = true;
+        walkingSound.play();
+      }
+    } else {
+      walkingSound.pause();
+      walkingSound.currentTime = 0;
+    }
 
     isTouchingWall();
 

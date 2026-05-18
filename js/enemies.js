@@ -7,6 +7,7 @@ const enemyImages = {
 
   snail: {
     walk: snailWalkImg,
+    hit: snailHitImg,
     die: snailDieImg,
   }
 };
@@ -16,6 +17,7 @@ let initialEnemies = [
     type: "boar",
     maxHealth: 20,
     health: 20,
+    damage: 10,
     x: 300,
     y: floor + height - 50,
     width: 80,
@@ -42,6 +44,7 @@ let initialEnemies = [
     type: "boar",
     maxHealth: 20,
     health: 20,
+    damage: 10,
     x: 200,
     y: 400-height,
     width: 80,
@@ -68,6 +71,7 @@ let initialEnemies = [
     type: "boar",
     maxHealth: 20,
     health: 20,
+    damage: 10,
     x: 400,
     y: 350-height,
     width: 80,
@@ -93,8 +97,9 @@ let initialEnemies = [
 
   {
     type: "snail",
-    maxHealth: 20,
-    health: 20,
+    maxHealth: 10,
+    health: 10,
+    damage: 5,
     x: 500,
     y: 350-height,
     width: 80,
@@ -110,8 +115,9 @@ let initialEnemies = [
     vy: 0,
     grounded: true,
     lastHitTime: 0,
-    frameWidth: 0,
-    frameHeight: 0,
+    hitDuration: 2000,
+    frameWidth: 384/8,
+    frameHeight: 32,
     frameY: 0,
     frameCount: 4,
     currentFrame: 0,
@@ -125,6 +131,16 @@ let enemies = structuredClone(initialEnemies);
 function updateEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
+    const now = Date.now();
+    const timeSinceHit = now - e.lastHitTime;
+    const isSnailHit = e.type === "snail" && timeSinceHit < (e.hitDuration || 1000);
+
+    // Reset frame when snail exits hit state
+    if (e.type === "snail" && !isSnailHit && e.wasHit) {
+      e.currentFrame = 0;
+      e.frameTick = 0;
+    }
+    e.wasHit = isSnailHit;
 
     const px = x;
     const py = y;
@@ -133,18 +149,21 @@ function updateEnemies() {
     const dy = py - e.y;
     const dist = Math.hypot(dx, dy);
 
-    if (e.state === "chase") {
-      e.direction = dx >= 0 ? 1 : -1;
-      e.x += e.chaseSpeed * e.direction;
-    } else {
-      e.x += e.speed * e.direction;
+    // Skip movement if snail is in hit state
+    if (!isSnailHit) {
+      if ( e.state === "chase") {
+        e.direction = dx >= 0 ? 1 : -1;
+        e.x += e.chaseSpeed * e.direction;
+      } else {
+        e.x += e.speed * e.direction;
 
-      if (e.x <= e.startX) e.direction = 1;
-      else if (e.x + e.width >= e.endX) e.direction = -1;
+        if (e.x <= e.startX) e.direction = 1;
+        else if (e.x + e.width >= e.endX) e.direction = -1;
+      }
+
+      e.vy += gravity;
+      e.y += e.vy;
     }
-
-    e.vy += gravity;
-    e.y += e.vy;
 
     e.grounded = false;
 
@@ -170,7 +189,11 @@ function updateEnemies() {
 
     e.frameTick = (e.frameTick || 0) + 1;
     if (e.frameTick >= (e.state === "chase" ? 6 : 10)) {
-      e.currentFrame = (e.currentFrame + 1) % e.frameCount;
+      if (isSnailHit) {
+        e.currentFrame = Math.min(e.currentFrame + 1, e.frameCount - 1);
+      } else {
+        e.currentFrame = (e.currentFrame + 1) % e.frameCount;
+      }
       e.frameTick = 0;
     }
   }
@@ -181,10 +204,14 @@ function drawEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
     const timeSinceHit = now - e.lastHitTime;
+    
     let animState = e.state === "chase" ? "run" : "walk";
-    if (timeSinceHit < 300) {
+    
+    const hitThreshold = (e.type === "snail") ? (e.hitDuration || 1000) : 300;
+    if (timeSinceHit < hitThreshold) {
       animState = "hit";
     }
+    
     const img = enemyImages[e.type] && enemyImages[e.type][animState];
 
     if (img && img.complete && img.naturalWidth > 0) {
@@ -288,7 +315,7 @@ function enemyCollision() {
     ){
       //Player collision with enemy
       if (!invincible) {
-        health -= boarDamage;
+        health -= e.damage;
         invincible = true;
         lastDamageTime = now;
 
@@ -308,7 +335,9 @@ function enemyCollision() {
       py + ph > dy &&
       py < dy + dh
     ){
-      e.state = "chase";
+      if (e.type !== "snail") {
+        e.state = "chase";
+      }
     } else {
       e.state = "patrol";
     }

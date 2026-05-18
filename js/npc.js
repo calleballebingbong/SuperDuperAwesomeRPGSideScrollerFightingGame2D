@@ -7,6 +7,7 @@ let npcs = [
     {
     id: "shop1",
     type: "merchant",
+    voice: speak1Sound,
     x: -300,
     y: floor - height / 3,
     width: 275,
@@ -27,7 +28,12 @@ let npcs = [
     chatRadius: 220,
     showBubble: false,
     interacted: false,
-    interactPrompt: "Press E to interact"
+    interactPrompt: "Press E to interact",
+    // Typewriter state
+    charIndex: 0,
+    lastCharTime: 0,
+    charDelayMs: 25, // ms per character (faster typewriter)
+    speaking: false
     }
 ];
 
@@ -44,17 +50,48 @@ function updateNPCs() {
         const distance = Math.hypot(dx, dy);
         n.showBubble = distance <= n.chatRadius;
 
+        const now = Date.now();
+
+        // Typewriter progression: reveal letters over time when speaking
+        if (n.interacted && n.speaking) {
+            if (now - n.lastCharTime >= n.charDelayMs) {
+                n.lastCharTime = now;
+                n.charIndex = Math.min(n.charIndex + 1, n.dialogLines[n.dialogIndex].length);
+                playSpeechForLetter(n.dialogLines[n.dialogIndex].charAt(n.charIndex - 1), n);
+                if (n.charIndex >= n.dialogLines[n.dialogIndex].length) {
+                    n.speaking = false; // finished this line
+                }
+            }
+        }
+
+        // Interaction handling: start speaking, fast-forward, or advance lines
         if (n.showBubble && interactPressed) {
             if (!n.interacted) {
+                // Begin interaction and start typing first line
                 n.interacted = true;
                 n.dialogIndex = 0;
+                n.charIndex = 0;
+                n.speaking = true;
+                n.lastCharTime = now - n.charDelayMs; // show first char immediately on next tick
             } else {
-                n.dialogIndex++;
-            }
-
-            if (n.dialogIndex >= n.dialogLines.length) {
-                n.dialogIndex = 0;
-                n.interacted = false;
+                // If currently typing, fast-forward to full line
+                if (n.speaking && n.charIndex < n.dialogLines[n.dialogIndex].length) {
+                    n.charIndex = n.dialogLines[n.dialogIndex].length;
+                    n.speaking = false;
+                } else {
+                    // Move to next line or end interaction
+                    n.dialogIndex++;
+                    if (n.dialogIndex >= n.dialogLines.length) {
+                        n.dialogIndex = 0;
+                        n.interacted = false;
+                        n.charIndex = 0;
+                        n.speaking = false;
+                    } else {
+                        n.charIndex = 0;
+                        n.speaking = true;
+                        n.lastCharTime = now - n.charDelayMs;
+                    }
+                }
             }
             interactPressed = false;
         }
@@ -75,7 +112,9 @@ function drawNPCs(ctx) {
         ctx.drawImage(img, sx, 0, n.frameWidth, n.frameHeight, drawX, drawY, n.width, n.height);
 
         if (n.showBubble) {
-            const bubbleText = n.interacted ? n.dialogLines[n.dialogIndex] : n.interactPrompt;
+            // Show typewriter text when interacting; otherwise show prompt
+            const fullLine = n.dialogLines[n.dialogIndex];
+            const bubbleText = n.interacted ? fullLine.substring(0, n.charIndex) || "" : n.interactPrompt;
             ctx.font = "20px Arial";
             ctx.textBaseline = "middle";
             const padding = 12;
@@ -97,4 +136,18 @@ function drawNPCs(ctx) {
             ctx.textAlign = "left";
         }
     }
+}
+
+// Placeholder for speech-per-letter audio.
+// Replace implementation with actual per-letter sound playback.
+function playSpeechForLetter(letter, npc) {
+    const source = npc && npc.voice ? npc.voice : speak1Sound;
+    if (!source) return;
+
+    const tick = source.cloneNode();
+    tick.volume = source.volume ?? 0.15;
+    tick.currentTime = 0;
+    tick.play().catch(() => {
+        // Handle play() promise rejection (e.g., due to browser autoplay policies)
+    });
 }
