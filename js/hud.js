@@ -61,10 +61,11 @@ function drawHUD() {
   ctx.fillStyle = "blue";
   ctx.font = "20px Arial";
   ctx.textAlign = "right";
-  ctx.fillText(`DMG up/down: T/Y, invincible N: ${invincible}`,canvas.width,20);
+  ctx.fillText(`DMG: ${playerDamage} T/Y, Speed: ${speed} U/I, invincible N: ${invincible}`,canvas.width,20);
   ctx.fillText(`PlayerDamage: ${playerDamage}, PlayerHealth: ${health}`,canvas.width,40);
   ctx.fillText(`BoarDamage: ${boarDamage}`,canvas.width,60);
   ctx.fillText(`Grounded: ${grounded}, OnWall: ${onWall}`,canvas.width,80);
+  ctx.fillText(`Attacking: ${attacking}, Moving:  ${moving ? "T" : "F"}`,canvas.width,100);
   } if (!showHitboxes){
       ctx.fillStyle = "red";
       ctx.font = "20px Arial";

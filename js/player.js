@@ -119,6 +119,7 @@ function updateAnimation() {
     }
   }
   else if (attacking) {
+    moving = false;
     setAnimation("attack");
     if (showHitboxes) {
     const ax = facingLeft ? x - attackHitBoxWidth : x + width;
