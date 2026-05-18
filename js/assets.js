@@ -29,6 +29,10 @@ snailHitImg.src = "fantasy/Mob/Snail/Hide-Sheet.png";
 const snailDieImg = new Image();
 snailDieImg.src = "fantasy/Mob/Snail/Dead-Sheet.png";
 
+// NPC images (temporary: reuse boar walk sheet for merchant animation)
+const merchantImg = new Image();
+merchantImg.src = "fantasy/npc/Characters/idle.png";
+
 
 // Object images
 const treeObjImg = new Image();
@@ -46,3 +50,7 @@ healthBarImg.src = "fantasy/HUD/Base-01.png";
 
 const playerPortraitImg = new Image();
 playerPortraitImg.src = "fantasy/portraits/playerIcon.png";
+
+//npc
+const merchantIdleImg = new Image();
+merchantIdleImg.src = "fantasy/npc/Charaters/NPC Merchant-idle.png";

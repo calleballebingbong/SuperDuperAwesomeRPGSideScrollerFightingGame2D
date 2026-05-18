@@ -1,9 +1,12 @@
+let interactPressed = false;
+
 addEventListener("keydown", function(e) {
     const action = e.code;
     if (action === "KeyB"){showHitboxes = !showHitboxes;}
     if (action === "KeyN") {invincible = !invincible;}
     if (action === "KeyD") rightDown = true;
     if (action === "KeyA") leftDown = true;
+    if (action === "KeyE") interactPressed = true;
     if (action === "KeyL") {
         const now = Date.now();
         if (now - lastAttackTime >= attackCooldown) {
@@ -42,6 +45,7 @@ addEventListener("keydown", function(e) {
 addEventListener("keyup", function(e) {
     if (e.code === "KeyD") rightDown = false;
     if (e.code === "KeyA") leftDown = false;
+    if (e.code === "KeyE") interactPressed = false;
     if (e.code === "KeyW" || e.code === "Space") jumpKeyRelease = true;
     if (e.code === "KeyR") resetGame();
 

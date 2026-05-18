@@ -170,6 +170,8 @@ function updateChar() {
     }
 
     drawBackground();
+    updateNPCs();
+    drawNPCs(ctx);
     updateAnimation();
     drawEnemies();
     drawPlayer();
