@@ -3,6 +3,11 @@ const enemyImages = {
     walk: boarWalkImg,
     run: boarRunImg,
     hit: boarHitImg,
+  },
+
+  snail: {
+    walk: snailWalkImg,
+    die: snailDieImg,
   }
 };
 
@@ -84,7 +89,35 @@ let initialEnemies = [
     frameCount: 4,
     currentFrame: 0,
     frameTick: 0
+  },
+
+  {
+    type: "snail",
+    maxHealth: 20,
+    health: 20,
+    x: 500,
+    y: 350-height,
+    width: 80,
+    height: 80,
+    speed: 1,
+    chaseSpeed: 2.5,
+    direction: 1,
+    state: "patrol",
+    detectRange: 300,
+    attackRange: 70,
+    startX: 400,
+    endX: 600,
+    vy: 0,
+    grounded: true,
+    lastHitTime: 0,
+    frameWidth: 0,
+    frameHeight: 0,
+    frameY: 0,
+    frameCount: 4,
+    currentFrame: 0,
+    frameTick: 0
   }
+  
 ];
 
 let enemies = structuredClone(initialEnemies);
@@ -100,7 +133,7 @@ function updateEnemies() {
     const dy = py - e.y;
     const dist = Math.hypot(dx, dy);
 
-    if (dist < e.detectRange) {
+    if (e.type !== "snail" && dist < e.detectRange) {
       e.state = "chase";
     } else {
       e.state = "patrol";
@@ -161,6 +194,11 @@ function drawEnemies() {
     const img = enemyImages[e.type] && enemyImages[e.type][animState];
 
     if (img && img.complete && img.naturalWidth > 0) {
+      if (!e.frameWidth || e.frameWidth <= 0) {
+        e.frameWidth = Math.floor(img.naturalWidth / Math.max(1, e.frameCount));
+        e.frameHeight = img.naturalHeight;
+      }
+
       const sx = e.currentFrame * e.frameWidth;
       const sy = e.frameY;
       const sw = e.frameWidth;

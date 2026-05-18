@@ -20,7 +20,14 @@ boarWalkImg.src = "fantasy/Mob/Boar/Walk/Walk-Base-Sheet.png";
 const boarRunImg = new Image();
 boarRunImg.src = "fantasy/Mob/Boar/Run/Run-Sheet.png"; 
 const boarHitImg = new Image();
-boarHitImg.src = "fantasy/Mob/Boar/Hit-Vanish/Hit-Sheet.png"; 
+boarHitImg.src = "fantasy/Mob/Boar/Hit-Vanish/Hit-Sheet.png";
+
+const snailWalkImg = new Image();
+snailWalkImg.src = "fantasy/Mob/Snail/walk-Sheet.png";
+const snailHitImg = new Image();
+snailHitImg.src = "fantasy/Mob/Snail/Hide-Sheet.png";
+const snailDieImg = new Image();
+snailDieImg.src = "fantasy/Mob/Snail/Dead-Sheet.png";
 
 
 // Object images
