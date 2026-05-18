@@ -62,19 +62,25 @@ function updateChar() {
     if(Date.now() - dashStartTime > dashDuration){
       dash = false;
     }
-  } else{
+    moving = true;
+  } else if(!attacking){
       if (leftDown) {
+        moving = true;
     vx = -speed;
     facingLeft = true;
   }
 
   if (rightDown) {
+    moving = true;
     vx = speed;
     facingLeft = false;
   }
+  
+  if(!leftDown && !rightDown) {
+    moving = false;
+  }
   }
 
-    console.log(vx)
     x += vx;
     vy += gravity;
 

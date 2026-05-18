@@ -3,11 +3,11 @@ const width = 50;
 const height = 150;
 let offsetY = -10;
 let offsetX = 10;
-const gravity = 1;
-const speed = 5;
-const wallSlideGravity = 2;
-const wallSlideMaxSpeed = 4;
-const maxJumps = 2;
+let gravity = 1;
+let speed = 5;
+let wallSlideGravity = 2;
+let wallSlideMaxSpeed = 4;
+let maxJumps = 2;
 const maxHealth = 100;
 const damageCooldown = 500; // ms
 let playerDamage = 5;
@@ -19,7 +19,8 @@ const attackCooldown = 750; // ms
 let immune = false;
 let showHitboxes = false;
 
-// Movement constant for dash
+// Movement constants
+let moving = false;
 let dash = false;
 let dashSpeed = 20;
 let dashDuration = 150; //ms

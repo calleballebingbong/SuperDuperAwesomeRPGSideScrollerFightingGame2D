@@ -19,7 +19,7 @@ addEventListener("keydown", function(e) {
 
         if (!dash && now - lastDashTime > dashCooldown){
             dash = true;
-            console.log(dash)
+            console.log(`Dash sucess`);
             dashStartTime = now;
             lastDashTime = now;
         }
@@ -40,6 +40,8 @@ addEventListener("keydown", function(e) {
     }
     if (action === "KeyT") {playerDamage += 5;}
     if (action === "KeyY") {playerDamage -= 5;}
+    if (action === "KeyI") {speed -= 1;}
+    if (action === "KeyU") {speed += 1;}
 });
 
 addEventListener("keyup", function(e) {
