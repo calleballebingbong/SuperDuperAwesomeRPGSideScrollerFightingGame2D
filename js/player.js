@@ -237,6 +237,11 @@ function playerAttack() {
       dmgDisplay.push({x: ex, y: ey, damage: playerDamage, time: Date.now()});
       e.health -= playerDamage;
       e.lastHitTime = now;
+
+      if (e.health <= 0) {
+        spawnCoin(e.x + e.width / 2, e.y + e.height / 2);
+      }
+
       hitThisFrame.add(i);
     }
   }

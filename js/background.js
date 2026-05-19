@@ -18,6 +18,9 @@ const mountainSlices = [
   { sx: 801, sy: 0, sw: 97.85, sh: 256 }
 ];
 
+let backgroundAutoScroll = 0;
+const backgroundAutoScrollSpeed = 0.3; // pixels per frame
+
 function drawTreeLayer(speed, yOffset, scale, alpha = 1) {
   if (!treeImg.complete || treeImg.naturalWidth === 0) return;
 
@@ -151,7 +154,8 @@ function drawBackground() {
   if (bgImg.complete && bgImg.naturalWidth > 0) {
     const bgSpeed = 0.1;
     const bgWidth = canvas.width * 2;
-    const x1 = -(scrollX * bgSpeed) % bgWidth;
+    backgroundAutoScroll = (backgroundAutoScroll + backgroundAutoScrollSpeed) % bgWidth;
+    const x1 = -((scrollX * bgSpeed + backgroundAutoScroll) % bgWidth);
 
     drawMountainLayer(0.01, -50, 1.4, 0.70);
     drawDarkMountainLayer(0.03, -30, 1.2, 1);

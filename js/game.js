@@ -217,6 +217,7 @@ function updateChar() {
     enemies = enemies.filter(e => e.health > 0);
 
     drawBlocks();
+    drawCoins();
     drawObjects();
 
     drawHUD();
